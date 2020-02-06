@@ -50,6 +50,7 @@ def run_epoch(data_iter, model, loss_compute):
 
 global max_src_in_batch, max_tgt_in_batch
 def batch_size_fn(new, count, sofar):
+    global max_src_in_batch, max_tgt_in_batch
     if count == 1:
         max_src_in_batch = 0
         max_tgt_in_batch = 0
