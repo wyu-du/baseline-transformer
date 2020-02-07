@@ -19,7 +19,7 @@ class Batch:
             self.trg = trg[:, :-1]
             self.trg_y = trg[:, 1:]
             self.trg_mask = self.make_std_mask(self.trg, pad)
-            self.ntokens = (self.trg_y != pad).data.sum()
+            self.ntokens = (self.trg_y != pad).data.sum().float().cuda()
             
     @staticmethod
     def make_std_mask(tgt, pad):
@@ -116,8 +116,9 @@ class LabelSmoothing(nn.Module):
         true_dist.scatter_(1, target.data.unsqueeze(1), self.confidence)
         true_dist[:, self.padding_idx] = 0
         mask = torch.nonzero(target.data == self.padding_idx)
-        if mask.dim() > 0:
-            true_dist.index_fill_(0, mask.squeeze(), 0.0)
+        if len(mask) > 0: 
+            if len(mask.squeeze()) > 0:
+                true_dist.index_fill_(0, mask.squeeze(), 0.0)
         self.true_dist = true_dist
         return self.criterion(x, Variable(true_dist, requires_grad=False))
     
